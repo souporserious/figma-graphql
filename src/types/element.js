@@ -25,13 +25,14 @@ exports.type = `
         # "CENTER": draw stroke centered along the shape boundary
         strokeAlign: String
         # Strokes applied to this node
-        strokes: [Stroke]
+        strokes: [Stroke],
+        children: [Element]
     }
 `;
 
 exports.resolvers = {
     Element: {
-        fill: root => getChildren(root, "fills[0].color"),
+        fill: root => (root.fills ? getChildren(root, "fills[0].color") : null),
         position: root => ({
             x: getChildren(root, "absoluteBoundingBox.x"),
             y: getChildren(root, "absoluteBoundingBox.y"),
