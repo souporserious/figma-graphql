@@ -1,4 +1,4 @@
-const { getChildren } = require("../utils");
+const { getChildren, removeEmpty } = require("../utils");
 
 exports.type = `
     type Element {
@@ -26,6 +26,7 @@ exports.type = `
         strokeAlign: String
         # Strokes applied to this node
         strokes: [Stroke]
+        elements(type: String, name: String): [Element!]
     }
 `;
 
@@ -40,5 +41,14 @@ exports.resolvers = {
             width: getChildren(root, "absoluteBoundingBox.width"),
             height: getChildren(root, "absoluteBoundingBox.height"),
         }),
+        elements: (root, args) => {
+            if (args) {
+                const { type, name } = args;
+                const match = removeEmpty({ type, name });
+                return getChildren(root, null, match);
+            }
+
+            return getChildren(root);
+        },
     },
 };

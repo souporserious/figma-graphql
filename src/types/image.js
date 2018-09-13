@@ -3,7 +3,7 @@ const { loadFigmaImages } = require("../utils");
 exports.type = `
     input Params {
         # A comma separated list of node IDs to render
-        ids: [String]
+        ids: [String]!
 
         # A number between 0.01 and 4, the image scaling factor
         scale: Int
@@ -12,23 +12,34 @@ exports.type = `
         format: String
     }
 
+    type ImageSrc {
+        id: String
+        source: String
+    }
+
     type Image {
-        # Images for the ID's you requested
-        images: [String]!
+        # Source of the images you requested
+        id: String
+        source: String
     }
 
     extend type Query {
         # Get just the image of a node id in a file
-        image(id: String!, params: Params): Image
+        images(id: String!, params: Params): Image
     }
 `;
 
 exports.resolvers = {
     Query: {
-        image: (root, { id, params = { ids: ["0:1"] } }) =>
+        images: (root, { id, params = { ids: ["0:1"] } }) =>
             loadFigmaImages(id, params).then(data => data),
     },
     Image: {
-        images: ({ images = [] }) => Object.values(images),
+        id: root => Object.keys(root)[0],
+        source: root => Object.values(root)[0],
+    },
+    ImageSrc: {
+        id: root => Object.keys(root)[0],
+        source: root => Object.values(root)[0],
     },
 };

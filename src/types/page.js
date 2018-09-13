@@ -12,12 +12,18 @@ exports.type = `
         # BG of the page
         backgroundColor: Color,
         # A node of fixed size containing other nodes
-        frames: [Frame!]
+        frames(name: String): [Frame!]
     }
 `;
 
 exports.resolvers = {
     Page: {
-        frames: root => getChildren(root),
+        frames: (root, { name }) => {
+            if (name) {
+                return getChildren(root, null, { name });
+            }
+
+            return getChildren(root);
+        },
     },
 };

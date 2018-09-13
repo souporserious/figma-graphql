@@ -1,4 +1,4 @@
-const { loadFigma, getChildren } = require("../utils");
+const { loadFigma, loadFigmaImages, getChildren } = require("../utils");
 
 exports.type = `
     # Information about a file
@@ -13,6 +13,8 @@ exports.type = `
         components: [String]
         # list of pages in this file
         pages(name: String): [Page!]
+        # list of images in this file
+        images(ids: [String]!, scale: Int, format: String): [Image!]
     }
 
     extend type Query {
@@ -23,7 +25,7 @@ exports.type = `
 
 exports.resolvers = {
     Query: {
-        file: (root, { id }) => loadFigma(id).then(data => data),
+        file: (root, { id }) => loadFigma(id).then(data => ({ ...data, id })),
     },
     File: {
         pages: (root, { name }) => {
@@ -33,5 +35,11 @@ exports.resolvers = {
 
             return getChildren(root, "document.children");
         },
+        images: (root, params) =>
+            loadFigmaImages(root.id, params).then(data => {
+                const res = Object.keys(data.images).map(i => ({ [i]: data.images[i] }));
+                console.log(res);
+                return res;
+            }),
     },
 };

@@ -12,32 +12,32 @@ const cache = {};
 
 const clearCache = id => delete cache[id];
 
-const getFigma = (fn, id, params) =>
+const getFigma = (fn, id, params, type = "file") =>
     new Promise((resolve, reject) => {
         const isParams = params ? { ...params } : null;
-        if (cache[id]) {
-            // eslint-disable-next-line
-            console.log("hit from cache", id);
-            resolve(cache[id]);
-        } else {
-            // eslint-disable-next-line
-            console.log("fetching", id);
-            fn(id, isParams)
-                .then(({ data }) => {
-                    cache[id] = data;
-                    // eslint-disable-next-line
-                    console.log("stored", id);
-                    resolve(data);
-                })
-                .catch(reject);
-        }
+        // if (cache[`${id}-${type}`]) {
+        //     // eslint-disable-next-line
+        //     console.log("hit from cache", id);
+        //     resolve(cache[`${id}-${type}`]);
+        // } else {
+        // eslint-disable-next-line
+        console.log("fetching", id);
+        fn(id, isParams)
+            .then(({ data }) => {
+                cache[`${id}-${type}`] = data;
+                // eslint-disable-next-line
+                console.log("stored", `${id}-${type}`);
+                resolve(data);
+            })
+            .catch(reject);
+        // }
     });
 
 const loadFigma = id => getFigma(file, id);
 
 const loadFigmaComments = id => getFigma(comments, id);
 
-const loadFigmaImages = (id, params) => getFigma(fileImages, id, params);
+const loadFigmaImages = (id, params) => getFigma(fileImages, id, params, "images");
 
 const loadTeamProjects = id => getFigma(teamProjects, id);
 
